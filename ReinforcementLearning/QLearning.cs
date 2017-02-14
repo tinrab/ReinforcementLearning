@@ -2,23 +2,16 @@
 
 namespace ReinforcementLearning
 {
-  public class QLearning
+  public class QLearning : IReinforcementLearning
   {
     private readonly double[][] _q;
-
-    public int StateCount { get; private set; }
-    public int ActionCount { get; }
 
     public double LearningRate { get; set; }
     public double DiscountFactor { get; set; }
     public IExplorationPolicy ExplorationPolicy { get; set; }
 
-    public QLearning(int stateCount,
-      int actionCount,
-      IExplorationPolicy explorationPolicy,
-      double learningRate = 0.1,
-      double discountFactor = 0.9,
-      bool initializeRandom = false)
+    public QLearning(int stateCount, int actionCount, IExplorationPolicy explorationPolicy, double learningRate = 0.1,
+      double discountFactor = 0.9, bool initializeRandom = false)
     {
       StateCount = stateCount;
       ActionCount = actionCount;
@@ -41,13 +34,9 @@ namespace ReinforcementLearning
       }
     }
 
-    /// <summary>
-    ///   Perform learning step.
-    /// </summary>
-    /// <param name="previousState">Previous state.</param>
-    /// <param name="action">Performed action.</param>
-    /// <param name="reward">Gained reward.</param>
-    /// <param name="nextState">Entered state after performing action.</param>
+    public int StateCount { get; }
+    public int ActionCount { get; }
+
     public void Learn(int previousState, int action, double reward, int nextState)
     {
       var nextReward = _q[nextState][0];
@@ -62,11 +51,6 @@ namespace ReinforcementLearning
                                   LearningRate * (reward + DiscountFactor * nextReward);
     }
 
-    /// <summary>
-    ///   Select action in current state.
-    /// </summary>
-    /// <param name="state">Current state.</param>
-    /// <returns>Selected action.</returns>
     public int SelectAction(int state)
     {
       return ExplorationPolicy.SelectAction(_q[state]);

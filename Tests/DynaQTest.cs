@@ -5,15 +5,15 @@ using ReinforcementLearning;
 namespace Tests
 {
   [TestClass]
-  public class QLearningTest
+  public class DynaQTest
   {
     [TestMethod]
-    public void QLearningGridPathTest()
+    public void DynaQGridPathTest()
     {
       var random = new Random(1337);
       var gridSize = 16;
       var grid = new int[gridSize, gridSize];
-      var ql = new QLearning(gridSize * gridSize, 4, new EpsilonGreedyExplorationPolicy(0.0), 0.3, 0.8);
+      var dq = new DynaQ(gridSize * gridSize, 4, new EpsilonGreedyExplorationPolicy(0.0), 5, 0.3, 0.8);
       var pathLength = 20;
       var maxReward = 0.0;
 
@@ -31,7 +31,7 @@ namespace Tests
 
         for (var j = 0; j < pathLength; j++) {
           var previousState = x + y * gridSize;
-          var a = (Action) ql.SelectAction(previousState);
+          var a = (Action) dq.SelectAction(previousState);
 
           switch (a) {
             case Action.UP:
@@ -59,7 +59,7 @@ namespace Tests
           currentReward += r;
 
           var nextState = x + y * gridSize;
-          ql.Learn(previousState, (int) a, r, nextState);
+          dq.Learn(previousState, (int) a, r, nextState);
         }
 
         if (currentReward > maxReward) {

@@ -50,6 +50,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="DynaQTest.cs" />
     <Compile Include="QLearningTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
