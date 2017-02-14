@@ -54,6 +54,7 @@
     <Compile Include="IReinforcementLearning.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QLearning.cs" />
+    <Compile Include="Sarsa.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

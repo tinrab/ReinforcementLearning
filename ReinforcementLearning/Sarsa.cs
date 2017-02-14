@@ -2,7 +2,7 @@
 
 namespace ReinforcementLearning
 {
-  public class QLearning : IReinforcementLearning
+  public class Sarsa : IReinforcementLearning
   {
     private readonly double[][] _q;
 
@@ -10,7 +10,7 @@ namespace ReinforcementLearning
     public double DiscountFactor { get; set; }
     public IExplorationPolicy ExplorationPolicy { get; set; }
 
-    public QLearning(int stateCount, int actionCount, IExplorationPolicy explorationPolicy, double learningRate = 0.1,
+    public Sarsa(int stateCount, int actionCount, IExplorationPolicy explorationPolicy, double learningRate = 0.1,
       double discountFactor = 0.9, bool initializeRandom = false)
     {
       StateCount = stateCount;
@@ -39,16 +39,10 @@ namespace ReinforcementLearning
 
     public void Learn(int previousState, int action, double reward, int nextState)
     {
-      var bestNext = _q[nextState][0];
+      var nextAction = SelectAction(nextState);
 
-      for (var i = 1; i < ActionCount; i++) {
-        if (_q[nextState][i] > bestNext) {
-          bestNext = _q[nextState][i];
-        }
-      }
-
-      var target = reward + DiscountFactor * bestNext;
-      var delta = target - _q[previousState][action];
+      var target = reward + DiscountFactor * _q[nextState][nextAction];
+      var delta =  target - _q[previousState][action];
       _q[previousState][action] += LearningRate * delta;
     }
 

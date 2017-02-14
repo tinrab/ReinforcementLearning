@@ -70,18 +70,21 @@ namespace ReinforcementLearning
 
     private void UpdateQ(int previousState, int action, double reward, int nextState)
     {
-      var nextReward = _q[nextState][0];
+      var bestNext = _q[nextState][0];
 
       for (var i = 1; i < ActionCount; i++) {
-        if (_q[nextState][i] > nextReward) {
-          nextReward = _q[nextState][i];
+        if (_q[nextState][i] > bestNext) {
+          bestNext = _q[nextState][i];
         }
       }
 
-      _q[previousState][action] = _q[previousState][action] * (1.0 - LearningRate) +
-                                  LearningRate * (reward + DiscountFactor * nextReward);
+      var target = reward + DiscountFactor * bestNext;
+      var delta = target - _q[previousState][action];
+      _q[previousState][action] += LearningRate * delta;
+
       _finalStates[previousState][action] = nextState;
       _rewards[previousState][action] = reward;
+
     }
 
     private void Plan()
