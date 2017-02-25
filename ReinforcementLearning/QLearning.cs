@@ -9,6 +9,10 @@ namespace ReinforcementLearning
     public double LearningRate { get; set; }
     public double DiscountFactor { get; set; }
     public IExplorationPolicy ExplorationPolicy { get; set; }
+    public int CurrentState { get; private set; }
+    public int SelectedAction { get; private set; }
+    public int StateCount { get; }
+    public int ActionCount { get; }
 
     public QLearning(int stateCount, int actionCount, IExplorationPolicy explorationPolicy, double learningRate = 0.1,
       double discountFactor = 0.9, bool initializeRandom = false)
@@ -34,10 +38,13 @@ namespace ReinforcementLearning
       }
     }
 
-    public int StateCount { get; }
-    public int ActionCount { get; }
+    public void Begin(int state)
+    {
+      CurrentState = state;
+      SelectedAction = ExplorationPolicy.SelectAction(_q[CurrentState]);
+    }
 
-    public void Learn(int previousState, int action, double reward, int nextState)
+    public void Step(double reward, int nextState)
     {
       var bestNext = _q[nextState][0];
 
@@ -48,13 +55,11 @@ namespace ReinforcementLearning
       }
 
       var target = reward + DiscountFactor * bestNext;
-      var delta = target - _q[previousState][action];
-      _q[previousState][action] += LearningRate * delta;
-    }
+      var delta = target - _q[CurrentState][SelectedAction];
+      _q[CurrentState][SelectedAction] += LearningRate * delta;
 
-    public int SelectAction(int state)
-    {
-      return ExplorationPolicy.SelectAction(_q[state]);
+      CurrentState = nextState;
+      SelectedAction = ExplorationPolicy.SelectAction(_q[CurrentState]);
     }
   }
 }

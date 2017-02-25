@@ -4,21 +4,20 @@
   {
     int StateCount { get; }
     int ActionCount { get; }
+    int CurrentState { get; }
+    int SelectedAction { get; }
+
+    /// <summary>
+    /// Begin learning process.
+    /// </summary>
+    /// <param name="state">Initial state.</param>
+    void Begin(int state);
 
     /// <summary>
     ///   Perform learning step.
     /// </summary>
-    /// <param name="previousState">Previous state.</param>
-    /// <param name="action">Performed action.</param>
     /// <param name="reward">Gained reward.</param>
     /// <param name="nextState">Entered state after performing action.</param>
-    void Learn(int previousState, int action, double reward, int nextState);
-
-    /// <summary>
-    ///   Select action in current state.
-    /// </summary>
-    /// <param name="state">Current state.</param>
-    /// <returns>Selected action.</returns>
-    int SelectAction(int state);
+    void Step(double reward, int nextState);
   }
 }

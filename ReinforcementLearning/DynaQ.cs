@@ -48,27 +48,33 @@ namespace ReinforcementLearning
       }
     }
 
-    public void Learn(int previousState, int action, double reward, int nextState)
-    {
-      if (!_visited.ContainsKey(previousState)) {
-        var actions = new HashSet<int>();
-        actions.Add(action);
-        _visited[previousState] = actions;
-      }
-
-      UpdateQ(previousState, action, reward, nextState);
-      Plan();
-    }
-
-    public int SelectAction(int state)
-    {
-      return ExplorationPolicy.SelectAction(_q[state]);
-    }
-
+    public int CurrentState { get; private set; }
+    public int SelectedAction { get; private set; }
     public int StateCount { get; }
     public int ActionCount { get; }
 
-    private void UpdateQ(int previousState, int action, double reward, int nextState)
+    public void Begin(int state)
+    {
+      CurrentState = state;
+      SelectedAction = ExplorationPolicy.SelectAction(_q[CurrentState]);
+    }
+
+    public void Step(double reward, int nextState)
+    {
+      if (!_visited.ContainsKey(CurrentState)) {
+        var actions = new HashSet<int>();
+        actions.Add(SelectedAction);
+        _visited[CurrentState] = actions;
+      }
+
+      UpdateQ(reward, nextState);
+      Plan();
+
+      CurrentState = nextState;
+      SelectedAction = ExplorationPolicy.SelectAction(_q[CurrentState]);
+    }
+
+    private void UpdateQ(double reward, int nextState)
     {
       var bestNext = _q[nextState][0];
 
@@ -79,12 +85,11 @@ namespace ReinforcementLearning
       }
 
       var target = reward + DiscountFactor * bestNext;
-      var delta = target - _q[previousState][action];
-      _q[previousState][action] += LearningRate * delta;
+      var delta = target - _q[CurrentState][SelectedAction];
+      _q[CurrentState][SelectedAction] += LearningRate * delta;
 
-      _finalStates[previousState][action] = nextState;
-      _rewards[previousState][action] = reward;
-
+      _finalStates[CurrentState][SelectedAction] = nextState;
+      _rewards[CurrentState][SelectedAction] = reward;
     }
 
     private void Plan()
@@ -97,7 +102,7 @@ namespace ReinforcementLearning
           var finalState = _finalStates[nextState][nextAction];
           var reward = _rewards[nextState][nextAction];
 
-          UpdateQ(nextState, nextAction, reward, finalState);
+          UpdateQ(reward, finalState);
         }
       }
     }

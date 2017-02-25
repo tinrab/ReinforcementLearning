@@ -9,6 +9,10 @@ namespace ReinforcementLearning
     public double LearningRate { get; set; }
     public double DiscountFactor { get; set; }
     public IExplorationPolicy ExplorationPolicy { get; set; }
+    public int CurrentState { get; private set; }
+    public int SelectedAction { get; private set; }
+    public int StateCount { get; }
+    public int ActionCount { get; }
 
     public Sarsa(int stateCount, int actionCount, IExplorationPolicy explorationPolicy, double learningRate = 0.1,
       double discountFactor = 0.9, bool initializeRandom = false)
@@ -34,21 +38,22 @@ namespace ReinforcementLearning
       }
     }
 
-    public int StateCount { get; }
-    public int ActionCount { get; }
-
-    public void Learn(int previousState, int action, double reward, int nextState)
+    public void Begin(int state)
     {
-      var nextAction = SelectAction(nextState);
-
-      var target = reward + DiscountFactor * _q[nextState][nextAction];
-      var delta =  target - _q[previousState][action];
-      _q[previousState][action] += LearningRate * delta;
+      CurrentState = state;
+      SelectedAction = ExplorationPolicy.SelectAction(_q[CurrentState]);
     }
 
-    public int SelectAction(int state)
+    public void Step(double reward, int nextState)
     {
-      return ExplorationPolicy.SelectAction(_q[state]);
+      var nextAction = ExplorationPolicy.SelectAction(_q[nextState]);
+
+      var target = reward + DiscountFactor * _q[nextState][nextAction];
+      var delta = target - _q[CurrentState][SelectedAction];
+      _q[CurrentState][SelectedAction] += LearningRate * delta;
+
+      CurrentState = nextState;
+      SelectedAction = ExplorationPolicy.SelectAction(_q[CurrentState]);
     }
   }
 }

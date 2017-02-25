@@ -29,11 +29,10 @@ namespace Tests
         var y = random.Next(0, gridSize);
         var currentReward = 0.0;
 
-        for (var j = 0; j < pathLength; j++) {
-          var previousState = x + y * gridSize;
-          var a = (Action) ql.SelectAction(previousState);
+        ql.Begin(x + y * gridSize);
 
-          switch (a) {
+        for (var j = 0; j < pathLength; j++) {
+          switch ((Action)ql.SelectedAction) {
             case Action.UP:
               y++;
               break;
@@ -59,7 +58,7 @@ namespace Tests
           currentReward += r;
 
           var nextState = x + y * gridSize;
-          ql.Learn(previousState, (int) a, r, nextState);
+          ql.Step(r, nextState);
         }
 
         if (currentReward > maxReward) {
